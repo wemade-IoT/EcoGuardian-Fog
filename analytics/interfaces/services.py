@@ -1,17 +1,31 @@
 from flask import request, Blueprint, jsonify
 from analytics.application.services import MetricService
+from analytics.domain.entities import Metric
+from analytics.infrastructure.services import ExternalMetricServiceFacade
 
 metric_api = Blueprint('metric_api', __name__)
 
 @metric_api.route('/metrics', methods=['POST'])
 def calculate_average_consume():
     data = request.json
-    if not data or 'consumption' not in data:
+    if not data or 'metrics' not in data or 'deviceId' not in data:
         return jsonify({'error': 'Invalid input'}), 400
 
-    consumption = data['consumption']
-    if not isinstance(consumption, list) or not all(isinstance(x, (int, float)) for x in consumption):
-        return jsonify({'error': 'Consumption must be a list of numbers'}), 400
+    metrics_data = data['metrics']
+    device_id = data['deviceId']
+    if not isinstance(metrics_data, list):
+        return jsonify({'error': 'Metrics must be a list'}), 400
 
-    average = MetricService.calculate_average(consumption)
-    return jsonify({'average_consumption': average}), 200
+    metrics = []
+    for item in metrics_data:
+        if not all(k in item for k in ('metricValue', 'metricTypesId')):
+            return jsonify({'error': 'Each metric must have metricValue and metricTypesId'}), 400
+        metrics.append(Metric(
+            metric_value=item['metricValue'],
+            metric_types_id=item['metricTypesId'],
+            device_id=device_id
+        ))
+
+    service = MetricService(ExternalMetricServiceFacade())
+    report = service.get_average_consume(metrics)
+    return jsonify({'report': report}), 200

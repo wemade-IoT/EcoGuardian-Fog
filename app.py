@@ -1,6 +1,8 @@
 from flask import Flask
+from analytics.interfaces.services import metric_api
 
 app = Flask(__name__)
+app.register_blueprint(metric_api)
 
 
 
