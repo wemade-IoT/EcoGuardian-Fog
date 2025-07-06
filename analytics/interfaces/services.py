@@ -2,11 +2,15 @@ from flask import request, Blueprint, jsonify
 from analytics.application.services import MetricService
 from analytics.domain.entities import Metric
 from analytics.infrastructure.services import ExternalMetricServiceFacade
+from iam.interfaces.services import authenticate_request
 
 metric_api = Blueprint('metric_api', __name__)
 
 @metric_api.route('/metrics', methods=['POST'])
 def calculate_average_consume():
+    auth_result = authenticate_request()
+    if auth_result:
+        return auth_result
     data = request.json
     if not data or 'metrics' not in data or 'deviceId' not in data:
         return jsonify({'error': 'Invalid input'}), 400
