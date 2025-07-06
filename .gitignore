@@ -10,3 +10,4 @@ iam/domain/__init__.py
 iam/domain/__pycache__/__init__.cpython-313.pyc
 iam/domain/__pycache__/entities.cpython-313.pyc
 iam/domain/__pycache__/services.cpython-313.pyc
+*.pyc

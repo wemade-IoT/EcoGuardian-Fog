@@ -1,7 +1,7 @@
 from flask import request, Blueprint, jsonify
 from analytics.application.services import MetricService
 from analytics.domain.entities import Metric
-from analytics.infrastructure.services import ExternalMetricServiceFacade
+from analytics.infrastructure.services import ExternalMetricServiceFacade, add_metrics_to_buffer
 from iam.interfaces.services import authenticate_request
 
 metric_api = Blueprint('metric_api', __name__)
@@ -29,6 +29,8 @@ def calculate_average_consume():
             metric_types_id=item['metricTypesId'],
             device_id=device_id
         ))
+
+    add_metrics_to_buffer(device_id, metrics)
 
     service = MetricService(ExternalMetricServiceFacade())
     report = service.get_average_consume(metrics)
