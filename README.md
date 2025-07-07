@@ -103,6 +103,8 @@ Submit environmental metrics from IoT devices.
 - `Api-Key: <device-api-key>`
 - `Device-Id: <device-id>`
 
+This is required for proper readings
+
 **Request Body:**
 ```json
 {
